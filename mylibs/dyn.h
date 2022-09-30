@@ -16,34 +16,9 @@
 
 #define FOREACH_PARAMS(index, value, type, cbParams) size_t index, void *value, enum DataType type, void *cbParams
 #define READ_VALUE(value, type) (*((DYNPRIV_CAST____##type *)value))
-
-#define PUSH_STRING(dArray, value) dArray= pushString(dArray, value)
-#define PUSH_INT(dArray, value) dArray= pushInt(dArray, value)
-#define PUSH_DOUBLE(dArray, value) dArray= pushDouble(dArray, value)
-#define PUSH_CHAR(dArray, value) dArray= pushChar(dArray, value)
-#define PUSH_BOOL(dArray, value) dArray= pushBool(dArray, value)
-#define PUSH_SIZE_T(dArray, value) dArray= pushSize_t(dArray, value)
-
-#define INSERT_STRING(dArray, index, value) dArray= insertString(dArray, index, value)
-#define INSERT_INT(dArray, index, value) dArray= insertInt(dArray, index, value)
-#define INSERT_DOUBLE(dArray, index, value) dArray= insertDouble(dArray, index, value)
-#define INSERT_STRING(dArray, index, value) dArray= insertString(dArray, index, value)
-#define INSERT_CHAR(dArray, index, value) dArray= insertChar(dArray, index, value)
-#define INSERT_BOOL(dArray, index, value) dArray= insertBool(dArray, index, value)
-#define INSERT_SIZE_T(dArray, index, value) dArray= insertSize_t(dArray, index, value)
-
-#define WRITE_STRING(dArray, index, value) dArray= writeString(dArray, index, value)
-#define WRITE_INT(dArray, index, value) dArray= writeInt(dArray, index, value)
-#define WRITE_DOUBLE(dArray, index, value) dArray= writeDouble(dArray, index, value)
-#define WRITE_STRING(dArray, index, value) dArray= writeString(dArray, index, value)
-#define WRITE_CHAR(dArray, index, value) dArray= writeChar(dArray, index, value)
-#define WRITE_BOOL(dArray, index, value) dArray= writeBool(dArray, index, value)
-#define WRITE_SIZE_T(dArray, index, value) dArray= writeSize_t(dArray, index, value)
-
-#define POP_LAST(dArray) dArray= popLast(dArray)
-#define DELETE_ENTRY(dArray, index) dArray= deleteEntry(dArray, index)
 //
 
+typedef struct DynamicArray DynamicArray;
 
 enum DataType {
     INT,
@@ -51,63 +26,55 @@ enum DataType {
     STRING,
     CHAR,
     BOOL,
-    SIZE_T
+    SIZE_T,
+    EMPTY
 };
-
-typedef struct DynamicArrayEntry {
-    void *value;
-    enum DataType type;
-} DynamicArrayEntry;
-
-typedef struct DynamicArray {
-    size_t length;
-    size_t size;
-    DynamicArrayEntry array[];
-} DynamicArray;
 
 typedef bool (*dyn_ForEachCallback)(size_t index, void *value, enum DataType type, void *cbParams);
 
-DynamicArray *makeDynamicArray(void);
-void freeDynamicArray(DynamicArray *dArray);
+struct Dyn {
+    DynamicArray *(*makeDynamicArray)(void);
+    void (*freeDynamicArray)(DynamicArray *dArray);
 
-DynamicArray *pushString(DynamicArray *dArray, char *str);
-DynamicArray *pushInt(DynamicArray *dArray, int value);
-DynamicArray *pushDouble(DynamicArray *dArray, double value);
-DynamicArray *pushChar(DynamicArray *dArray, char value);
-DynamicArray *pushBool(DynamicArray *dArray, bool value);
-DynamicArray *pushSize_t(DynamicArray *dArray, size_t value);
+    void (*pushString)(DynamicArray *dArray, char *str);
+    void (*pushInt)(DynamicArray *dArray, int value);
+    void (*pushDouble)(DynamicArray *dArray, double value);
+    void (*pushChar)(DynamicArray *dArray, char value);
+    void (*pushBool)(DynamicArray *dArray, bool value);
+    void (*pushSize_t)(DynamicArray *dArray, size_t value);
 
-DynamicArray *popLast(DynamicArray *dArray);
+    void (*popLast)(DynamicArray *dArray);
 
-DynamicArray *insertString(DynamicArray *dArray, size_t index, char *str);
-DynamicArray *insertInt(DynamicArray *dArray, size_t index, int value);
-DynamicArray *insertDouble(DynamicArray *dArray, size_t index, double value);
-DynamicArray *insertChar(DynamicArray *dArray, size_t index, char value);
-DynamicArray *insertBool(DynamicArray *dArray, size_t index, bool value);
-DynamicArray *insertSize_t(DynamicArray *dArray, size_t index, size_t value);
+    void (*insertString)(DynamicArray *dArray, size_t index, char *str);
+    void (*insertInt)(DynamicArray *dArray, size_t index, int value);
+    void (*insertDouble)(DynamicArray *dArray, size_t index, double value);
+    void (*insertChar)(DynamicArray *dArray, size_t index, char value);
+    void (*insertBool)(DynamicArray *dArray, size_t index, bool value);
+    void (*insertSize_t)(DynamicArray *dArray, size_t index, size_t value);
 
-DynamicArray *deleteEntry(DynamicArray *dArray, size_t index);
+    void (*deleteEntry)(DynamicArray *dArray, size_t index);
 
-DynamicArray *writeString(DynamicArray *dArray, size_t index, char *str);
-DynamicArray *writeInt(DynamicArray *dArray, size_t index, int value);
-DynamicArray *writeDouble(DynamicArray *dArray, size_t index, double value);
-DynamicArray *writeChar(DynamicArray *dArray, size_t index, char value);
-DynamicArray *writeBool(DynamicArray *dArray, size_t index, bool value);
-DynamicArray *writeSize_t(DynamicArray *dArray, size_t index, size_t value);
+    void (*writeString)(DynamicArray *dArray, size_t index, char *str);
+    void (*writeInt)(DynamicArray *dArray, size_t index, int value);
+    void (*writeDouble)(DynamicArray *dArray, size_t index, double value);
+    void (*writeChar)(DynamicArray *dArray, size_t index, char value);
+    void (*writeBool)(DynamicArray *dArray, size_t index, bool value);
+    void (*writeSize_t)(DynamicArray *dArray, size_t index, size_t value);
 
+    const enum DataType (*getType)(DynamicArray *dArray, size_t index);
+    void *(*getPtrToValue)(DynamicArray *dArray, size_t index);
 
+    char *(*getString)(DynamicArray *dArray, size_t index);
+    int (*getInt)(DynamicArray *dArray, size_t index);
+    double (*getDouble)(DynamicArray *dArray, size_t index);
+    char (*getChar)(DynamicArray *dArray, size_t index);
+    bool (*getBool)(DynamicArray *dArray, size_t index);
+    size_t (*getSize_t)(DynamicArray *dArray, size_t index);
 
-enum DataType getType(DynamicArray *dArray, size_t index);
-void *getPtrToValue(DynamicArray *dArray, size_t index);
+    bool (*forEach)(DynamicArray *dArray, dyn_ForEachCallback callback, void *cbParams);
+    void (*logTypes)(DynamicArray *dArray);
+};
 
-char *getString(DynamicArray *dArray, size_t index);
-int getInt(DynamicArray *dArray, size_t index);
-double getDouble(DynamicArray *dArray, size_t index);
-char getChar(DynamicArray *dArray, size_t index);
-bool getBool(DynamicArray *dArray, size_t index);
-size_t getSize_t(DynamicArray *dArray, size_t index);
-
-bool dyn_forEach(DynamicArray *dArray, dyn_ForEachCallback callback, void *cbParams);
-void logTypes(DynamicArray *dArray);
+extern const struct Dyn Dyn;
 
 #endif

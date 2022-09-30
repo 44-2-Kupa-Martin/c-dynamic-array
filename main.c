@@ -28,25 +28,15 @@ bool printValues(FOREACH_PARAMS(index, value, type, myArgs)) {
 }
 
 int main(int argc, char const *argv[]) {
-    DynamicArray *myDynArray= makeDynamicArray();
-    PUSH_STRING(myDynArray, "hello world");
-    PUSH_DOUBLE(myDynArray, 3.1415);
-    PUSH_INT(myDynArray, 16);
-    PUSH_SIZE_T(myDynArray, 125);
-    dyn_forEach(myDynArray, printValues, NULL);
-    printf("\n");
-    // POP_LAST(myDynArray);
-    // printf("\n");
-    // dyn_forEach(myDynArray, printValues, NULL);
-    // INSERT_STRING(myDynArray, 1, "mytest");
-    // INSERT_INT(myDynArray, 1, 69420);
-    // printf("\n");
-    // dyn_forEach(myDynArray, printValues, NULL);
-    // DELETE_ENTRY(myDynArray, 2);
-    // printf("\n");
-    // dyn_forEach(myDynArray, printValues, NULL);
-    WRITE_STRING(myDynArray, 2, "bruh");
-    dyn_forEach(myDynArray, printValues, NULL);
-    freeDynamicArray(myDynArray);
+    DynamicArray *myDynArray= Dyn.makeDynamicArray();
+    Dyn.pushString(myDynArray, "hello world");
+    Dyn.pushInt(myDynArray, 69420);
+    Dyn.insertDouble(myDynArray, 6, 3.14);
+    Dyn.logTypes(myDynArray);
+    Dyn.deleteEntry(myDynArray, 1);
+    Dyn.logTypes(myDynArray);
+    Dyn.popLast(myDynArray);
+    Dyn.logTypes(myDynArray);
+    Dyn.forEach(myDynArray, printValues, NULL);
     return 0;
 }
